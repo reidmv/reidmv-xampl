@@ -1,13 +1,11 @@
 require 'spec_helper'
 
-describe 'vale::install' do
-
+describe 'xampl::install' do
   context 'When included from an external module' do
-    let(:pre_condition) { } # Remove the mocked assert_private()
     it { is_expected.to compile.and_raise_error %r{is private} }
   end
 
-  context 'When included from the vale module' do
+  context 'When included from the xampl module' do
     let(:pre_condition) do
       # This mocks the assert_private() function so that the class may be tested
       'function assert_private() { }'

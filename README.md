@@ -1,88 +1,120 @@
+# xampl
 
-# vale
+A module demonstrating the enableable Puppet code pattern.
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
+This module was created using the Puppet Development Kit (PDK). A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/docs/pdk/1.x/pdk_creating_modules.html.
 
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with vale](#setup)
-    * [What vale affects](#what-vale-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with vale](#beginning-with-vale)
-3. [Usage - Configuration options and additional functionality](#usage)
-4. [Limitations - OS compatibility, etc.](#limitations)
-5. [Development - Guide for contributing to the module](#development)
+2. [Pattern](#pattern)
+2. [Usage](#usage)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
+The xampl module demonstrates a Puppet code pattern to render selected classes "enableable". This means that the desired state they assert can be turned on or off, on a per-node basis, using class parameters.
 
-This should be a fairly short description helps the user decide if your module is what they want.
+In addition to demonstrating the pattern, the module includes examples of tests to assert that a class can be properly enabled or disabled.
 
-## Setup
+## Pattern
 
-### What vale affects **OPTIONAL**
+The enableable pattern is intentionally simple and has two main elements. 
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
+### Element 1: the `enabled` parameter
 
-If there's more that they should know about, though, this is the place to mention:
+First, decide which module class (or classes) are public interfaces and intended to be `include`'d from roles or profiles. Oftentimes, there will only be one public interface class in a module, and it will be the class defined in a module's `init.pp` file.
 
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
+On these public interface classes, implement the following pattern.
 
-### Setup Requirements **OPTIONAL**
+```puppet
+class xampl (
+  Boolean $enabled = true,
+  ...
+) {
+  if ($enabled) {
 
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
+    # CONFIGURATION CODE GOES HERE
 
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+  }
+  else {
+    tag 'disabled'
+  }
+}
+```
 
-### Beginning with vale
+* Define a Boolean parameter named `enabled`, with a default value – typically `true`.
+* The first line of code inside the module's opening curly bracket should be `if ($enabled) { ...`.
+* The `if` statement should fully enclose ALL other configuration code in the module.
+* The `else` clause should tag the class "disabled".
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+Note: the else clause exists to aid in querying for and giving visibility into nodes that have disabled classes.
+
+### Element 2: use of `assert_private()`
+
+Private implementation classes should not use the `enabled` parameter and `if` statement. Because these classes cannot be individually enabled or disabled, they should instead use the `assert_private()` function to protect against accidental inclusion from anywhere except the module's public interface classes, which can be enabled or disabled.
+
+```puppet
+class xampl::install (
+  # Parameters, if any
+) {
+  assert_private()
+
+  # CONFIGURATION CODE GOES HERE
+
+}
+```
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
-
-## Reference
-
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
+Enableable classes can be enabled or disabled by setting the Hiera data value for the node. The Hiera key will be of the form `<class_name>::enabled: <true/false>`.
 
 ```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
+xampl::enabled: true
 ```
 
-## Limitations
+```
+xampl::enabled: false
+```
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+## Testing
 
-## Development
+For samples of how to write rspec-puppet tests validating that this pattern is correctly implemented, see the spec files provided.
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
+* spec/classes/xampl\_spec.rb
+* spec/classes/install\_spec.rb
 
-## Release Notes/Contributors/Etc. **Optional**
+## Querying
 
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+These examples are in PQL. The same can be accomplished similarly in AST.
+
+List all enableable classes currently disabled, and on how many nodes they are disabled.
+
+```
+resources[title, count()] {
+  type = "Class" and
+  parameters.enabled = false and
+  tag = "disabled"
+  group by title
+}
+```
+
+List all nodes for which "Xampl" is disabled.
+
+```
+resources[certname] {
+  type = "Class" and
+  parameters.enabled = false and
+  tag = "disabled" and
+  title = "Xampl"
+}
+```
+
+In a single query, return a mixed dataset detailing all nodes with any classes disabled, and which classes those are.
+
+```
+resources[certname, title] {
+  type = "Class" and
+  parameters.enabled = false and
+  tag = "disabled"
+}
+```
