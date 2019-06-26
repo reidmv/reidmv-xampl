@@ -7,6 +7,7 @@ This module was created using the Puppet Development Kit (PDK). A short overview
 #### Table of Contents
 
 1. [Description](#description)
+2. [xampl-pdk-templates](#xampl-pdk-templates)
 2. [Enableable Pattern](#enableable-pattern)
     * [Element 1](#element-1-the-enabled-parameter)
     * [Element 2](#element-2-use-of-assert_private)
@@ -20,6 +21,12 @@ This module was created using the Puppet Development Kit (PDK). A short overview
 ## Description
 
 The xampl module demonstrates Puppet code and testing patterns. These patterns typically include usage and accompanying rspec-puppet shared example tests which can be incorporated into a CI system to enforce compliance with the patterns.
+
+## xample-pdk-templates
+
+This module uses content which may be common to many modules, in the form of shared rspec-puppet examples. This content is centralized in a PDK templates repo [here](https://github.com/reidmv/xampl-pdk-templates). By using a PDK templates repo, a module can easily be brought up to date with the latest shared content by running `pdk update`.
+
+See also: [pdksync](https://github.com/puppetlabs/pdksync). A tool to manage `pdk update` operations centrally for a large library of modules.
 
 ## Enableable Pattern
 

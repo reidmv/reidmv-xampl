@@ -18,9 +18,9 @@ describe 'xampl::reboot' do
     let(:facts) do
       { 'allow_reboot' => true }
     end
-  let(:params) do
-    { 'noop' => true }
-  end
+    let(:params) do
+      { 'noop' => true }
+    end
 
     it { is_expected.to contain_reboot('spec-reboot').with_noop(true) }
   end
@@ -37,9 +37,9 @@ describe 'xampl::reboot' do
     let(:facts) do
       { 'allow_reboot' => false }
     end
-  let(:params) do
-    { 'noop' => false }
-  end
+    let(:params) do
+      { 'noop' => false }
+    end
 
     it { is_expected.to contain_reboot('spec-reboot').with_noop(true) }
   end

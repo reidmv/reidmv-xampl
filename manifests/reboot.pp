@@ -1,3 +1,7 @@
+# @summary
+#   This defined type wraps the reboot resource and provides precise control
+#   over when or if the reboot resource is permitted to be enforced.
+#
 define xampl::reboot (
   Optional[String]  $when    = undef,
   Optional[String]  $onlyif  = undef,
@@ -11,7 +15,7 @@ define xampl::reboot (
   # Allow a reboot only if the opt-in fact has been set
   $noop_metaparam = if ($facts['clientnoop'] == true) {
                       true # Client is running in noop mode; noop=true
-                    } elsif ($facts['allow_reboot'] in [true, 'true']) {
+                    } elsif ($facts['allow_reboot'] in [true, 'true']) { # lint:ignore:quoted_booleans
                       $noop # Reboot allowed... noop=undef (or possibly Boolean)
                     } else {
                       true # Not allowed to reboot; noop=true

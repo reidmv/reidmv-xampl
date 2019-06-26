@@ -16,18 +16,16 @@ RSpec.shared_examples 'a class without unprotected reboots' do
   end
 
   it 'does not have any unprotected reboot resources' do
-    expect(reboot_resources).to all(satisfy { |r1|
+    expect(reboot_resources).to all(satisfy do |r1|
       catalogue.resources.find { |r2| r2.type == 'Xampl::Reboot' && r2.title == r1.title }
-    })
+    end)
   end
 end
 
 RSpec.shared_examples 'an enableable class' do |parameters = {}|
   context 'When disabled' do
     let(:params) do
-      parameters.merge({
-        enabled: false,
-      })
+      parameters.merge(enabled: false)
     end
 
     it 'is tagged "disabled"' do
@@ -59,17 +57,17 @@ RSpec.shared_examples 'an includable class' do
   end
 end
 
-RSpec.shared_examples 'a private class' do |pre_condition = ""|
+RSpec.shared_examples 'a private class' do |pre_condition = ''|
   context 'When included from an external module' do
     it { is_expected.to compile.and_raise_error %r{is private} }
   end
 
-  context "When included from this module" do
+  context 'When included from this module' do
     let(:pre_condition) do
       [
         # This mocks the assert_private() function so that the class may be tested
-       'function assert_private() { }',
-        pre_condition
+        'function assert_private() { }',
+        pre_condition,
       ].join("\n")
     end
 
