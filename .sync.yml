@@ -1,6 +1,8 @@
 ---
 spec/spec_helper.rb:
   mock_with: ':rspec'
+  spec_overrides:
+    - "require 'shared_examples.rb'"
 appveyor.yml:
   delete: true
 .travis.yml:

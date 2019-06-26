@@ -15,4 +15,8 @@ class xampl::install {
     message => 'this is a resource',
   }
 
+  xampl::reboot { 'foo':
+    when => 'refreshed',
+  }
+
 }

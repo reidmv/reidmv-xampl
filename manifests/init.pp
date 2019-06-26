@@ -10,7 +10,7 @@ class xampl (
   String  $param1  = 'Other class parameters',
   String  $param2  = 'as needed',
 ) {
-  enabled_code($enabled) || {
+  xampl::enabled_code($enabled) || {
 
     # CONFIGURATION CODE GOES HERE
     notify { 'enabled pattern':

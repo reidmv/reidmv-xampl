@@ -1,22 +1,29 @@
 # xampl
 
-A module demonstrating the enableable Puppet code pattern.
+A module demonstrating Puppet code patterns.
 
 This module was created using the Puppet Development Kit (PDK). A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/docs/pdk/1.x/pdk_creating_modules.html.
 
 #### Table of Contents
 
 1. [Description](#description)
-2. [Pattern](#pattern)
-2. [Usage](#usage)
+2. [Enableable Pattern](#enableable-pattern)
+    * [Element 1](#element-1-the-enabled-parameter)
+    * [Element 2](#element-2-use-of-assert_private)
+    * [Enableable Usage](#enableable-usage)
+    * [Enableable Testing](#enableable-testing)
+    * [Enableable Querying](#enableable-querying)
+3. [Protected Reboot Pattern](#protected-reboot-pattern)
+    * [Protected Reboot Usage](#protected-reboot-usage)
+    * [Protected Reboot Testing](#protected-reboot-testing)
 
 ## Description
 
-The xampl module demonstrates a Puppet code pattern to render selected classes "enableable". This means that the desired state they assert can be turned on or off, on a per-node basis, using class parameters.
+The xampl module demonstrates Puppet code and testing patterns. These patterns typically include usage and accompanying rspec-puppet shared example tests which can be incorporated into a CI system to enforce compliance with the patterns.
 
-In addition to demonstrating the pattern, the module includes examples of tests to assert that a class can be properly enabled or disabled.
+## Enableable Pattern
 
-## Pattern
+Enableable is a Puppet code pattern to render selected classes "enableable". This means that the desired state they assert can be turned on or off, on a per-node basis, using class parameters.
 
 The enableable pattern is intentionally simple and has two main elements. 
 
@@ -64,7 +71,7 @@ class xampl::install (
 }
 ```
 
-## Usage
+### Enableable Usage
 
 Enableable classes can be enabled or disabled by setting the Hiera data value for the node. The Hiera key will be of the form `<class_name>::enabled: <true/false>`.
 
@@ -76,14 +83,14 @@ xampl::enabled: true
 xampl::enabled: false
 ```
 
-## Testing
+### Enableable Testing
 
 For samples of how to write rspec-puppet tests validating that this pattern is correctly implemented, see the spec files provided.
 
 * spec/classes/xampl\_spec.rb
 * spec/classes/install\_spec.rb
 
-## Querying
+### Enableable Querying
 
 These examples are in PQL. The same can be accomplished similarly in AST.
 
@@ -118,3 +125,42 @@ resources[certname, title] {
   tag = "disabled"
 }
 ```
+
+## Protected Reboot Pattern
+
+The protected reboot pattern demonstrates wrapping a reboot resource in a defined type that carefully controls when the nested reboot resource is allowed to be defined in enforcement mode. The resource will be locked to noop mode unless all required conditions are met.
+
+Enforcement of the pattern is accomplished by way of CI and rspec-puppet shared examples.
+
+### Protected Reboot Usage
+
+A protected reboot resource is defined in code using the defined type name, and any valid reboot resource parameters.
+
+```puppet
+xampl::reboot { 'protected reboot':
+  when => 'refreshed',
+}
+```
+
+The enforcement behavior of the resulting reboot resource is controlled by a fact value: `facts.allow_reboot`. When this fact is set to Boolean true or String "true", the reboot resource will behave exactly as written. However, if this fact is not set, or set to any value except those already described, the reboot resource created will be hard-locked to `noop` mode.
+
+Normal Puppet runs that do not have a value for this fact will therefore not contain any "live" reboot resources. Any reboot resources that exist will be noop resources.
+
+When it is safe to perform reboots if necessary, invoke Puppet as follows, using an environment variable to set a one-time value for `facts.allow_reboot`.
+
+```
+FACTER_allow_reboot=true /opt/puppetlabs/bin/puppet agent -t
+```
+
+### Protected Reboot Testing
+
+Making sure the shared examples are available, see for example:
+
+```
+describe 'xampl::install' do
+  it_behaves_like 'a policy-compliant class'
+end
+```
+
+* [spec/shared\_examples.rb](spec/shared_examples.rb)
+* [spec/classes/install\_spec.rb](spec/classes/install_spec.rb)
