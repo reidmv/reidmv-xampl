@@ -40,6 +40,29 @@ First, decide which module class (or classes) are public interfaces and intended
 
 On these public interface classes, implement the following pattern.
 
+#### Automated implementation
+
+```puppet
+class xampl (
+  Boolean $enabled = true,
+  ...
+) {
+  xampl::enabled_code() || {
+
+    # CONFIGURATION CODE GOES HERE
+
+  }
+}
+```
+
+* Define a Boolean parameter named `enabled`, with a default value – typically `true`.
+* The first line of code inside the module's opening curly bracket should be `xampl::enabled_code() || {`
+* This block should fully enclose ALL other configuration code in the class.
+
+See the function definition [here](lib/puppet/functions/xampl/enabled_code.rb) for full implementation details, or review the manual version below to understand what this will do.
+
+#### Manual implementation
+
 ```puppet
 class xampl (
   Boolean $enabled = true,
@@ -58,7 +81,7 @@ class xampl (
 
 * Define a Boolean parameter named `enabled`, with a default value – typically `true`.
 * The first line of code inside the module's opening curly bracket should be `if ($enabled) { ...`.
-* The `if` statement should fully enclose ALL other configuration code in the module.
+* The `if` statement should fully enclose ALL other configuration code in the class.
 * The `else` clause should tag the class "disabled".
 
 Note: the else clause exists to aid in querying for and giving visibility into nodes that have disabled classes.
@@ -94,8 +117,9 @@ xampl::enabled: false
 
 For samples of how to write rspec-puppet tests validating that this pattern is correctly implemented, see the spec files provided.
 
-* spec/classes/xampl\_spec.rb
-* spec/classes/install\_spec.rb
+* [spec/classes/xampl\_spec.rb](spec/classes/xampl_spec.rb)
+* [spec/classes/install\_spec.rb](spec/classes/install_spec.rb)
+* [spec/shared\_examples.rb](spec/shared_examples.rb)
 
 ### Enableable Querying
 
