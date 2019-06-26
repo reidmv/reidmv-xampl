@@ -8,15 +8,16 @@ This module was created using the Puppet Development Kit (PDK). A short overview
 
 1. [Description](#description)
 2. [xampl-pdk-templates](#xampl-pdk-templates)
-2. [Enableable Pattern](#enableable-pattern)
+3. [Enableable Pattern](#enableable-pattern)
     * [Element 1](#element-1-the-enabled-parameter)
     * [Element 2](#element-2-use-of-assert_private)
     * [Enableable Usage](#enableable-usage)
     * [Enableable Testing](#enableable-testing)
     * [Enableable Querying](#enableable-querying)
-3. [Protected Reboot Pattern](#protected-reboot-pattern)
+4. [Protected Reboot Pattern](#protected-reboot-pattern)
     * [Protected Reboot Usage](#protected-reboot-usage)
     * [Protected Reboot Testing](#protected-reboot-testing)
+5. [Enforcing policies](#enforcing-policies)
 
 ## Description
 
@@ -195,3 +196,9 @@ end
 
 * [spec/shared\_examples.rb](spec/shared_examples.rb)
 * [spec/classes/install\_spec.rb](spec/classes/install_spec.rb)
+
+## Enforcing Policies
+
+Enforcing that all content pass common requirements can be done at the control-repo level using roles, and [onceover](https://github.com/dylanratcliffe/onceover). Onceover will run a basic test automatically on all roles defined in the control-repo. By default it only checks that the role will compile, but onceover allows the set of required tests to be expanded and can include other shared examples, such as the `it behaves like a policy-compliant class` shared example demonstrated in this module.
+
+For more information, see [https://github.com/dylanratcliffe/onceover#accessing-onceover-in-a-traditional-rspec-test](https://github.com/dylanratcliffe/onceover#accessing-onceover-in-a-traditional-rspec-test).
