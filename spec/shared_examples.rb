@@ -66,7 +66,7 @@ RSpec.shared_examples 'a private class' do |pre_condition = ""|
 
   context "When included from this module" do
     let(:pre_condition) do
-      [ 
+      [
         # This mocks the assert_private() function so that the class may be tested
        'function assert_private() { }',
         pre_condition
