@@ -13,6 +13,10 @@
     {
       "name": "puppetlabs/reboot",
       "version_requirement": ">= 2.1.2 < 3.0.0"
+    },
+    {
+      "name": "trlinkin/noop",
+      "version_requirement": ">= 1.0.0 < 2.0.0"
     }
   ],
   "operatingsystem_support": [
