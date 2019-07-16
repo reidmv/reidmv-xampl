@@ -84,6 +84,7 @@ RSpec.shared_examples 'a no-op class' do
     op_resources = catalogue.resources
                             .select { |r| contained_by?(r, container, catalogue) }
                             .select { |r| r[:noop] != true }
+                            .map { |r| r.ref } # For clarity in output
 
     expect(op_resources).to eq([])
   end
