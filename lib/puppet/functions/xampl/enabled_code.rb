@@ -10,9 +10,9 @@ Puppet::Functions.create_function(:'xampl::enabled_code', Puppet::Functions::Int
     required_block_param
   end
 
-  def auto_enabled_code(scope)
+  def auto_enabled_code(scope, &block)
     if scope.has_local_variable?('enabled') && [true, false].include?(scope['enabled'])
-      enabled_code(scope, scope['enabled'])
+      enabled_code(scope, scope['enabled'], &block)
     else
       raise "Unable to implement xampl::enabled_code(). Class must define specific parameter:\n" \
             "  class example (\n" \
@@ -26,7 +26,7 @@ Puppet::Functions.create_function(:'xampl::enabled_code', Puppet::Functions::Int
     end
   end
 
-  def enabled_code(scope, enabled)
+  def enabled_code(scope, enabled, &block)
     case enabled
     when true
       yield
