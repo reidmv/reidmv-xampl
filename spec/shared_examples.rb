@@ -73,16 +73,19 @@ RSpec.shared_examples 'a no-op includable class' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }
-
-      it "sets all resources contained in the class to no-op" do
-        container = catalogue.resources.find { |r| r.class? && r.title.downcase == class_name.downcase }
-        op_resources = catalogue.resources
-                                .select { |r| contained_by?(r, container, catalogue) }
-                                .select { |r| r[:noop] != true }
-
-        expect(op_resources).to eq([])
-      end
+      include_examples 'a no-op class'
     end
+  end
+end
+
+RSpec.shared_examples 'a no-op class' do
+  it "sets all resources contained in the class to no-op" do
+    container = catalogue.resources.find { |r| r.class? && r.title.downcase == class_name.downcase }
+    op_resources = catalogue.resources
+                            .select { |r| contained_by?(r, container, catalogue) }
+                            .select { |r| r[:noop] != true }
+
+    expect(op_resources).to eq([])
   end
 end
 
