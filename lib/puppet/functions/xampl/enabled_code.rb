@@ -26,7 +26,7 @@ Puppet::Functions.create_function(:'xampl::enabled_code', Puppet::Functions::Int
     end
   end
 
-  def enabled_code(scope, enabled, &block)
+  def enabled_code(scope, enabled)
     case enabled
     when true
       yield
