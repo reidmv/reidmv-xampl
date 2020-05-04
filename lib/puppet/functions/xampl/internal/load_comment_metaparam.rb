@@ -1,9 +1,9 @@
-Puppet::Functions.create_function(:'xampl::enable_comment_metaparam') do
-  dispatch :comment do
+Puppet::Functions.create_function(:'xampl::internal::load_comment_metaparam') do
+  dispatch :load_comment do
     # No parameters
   end
 
-  def comment
+  def load_comment
     unless Puppet::Type.metaparam?(:comment)
       Puppet::Type.newmetaparam(:comment) do
          desc "A user-supplied comment about this resource. The comment is non-operative,
@@ -11,5 +11,7 @@ Puppet::Functions.create_function(:'xampl::enable_comment_metaparam') do
             purposes."
       end
     end
+
+    'load-content-metaparam'
   end
 end
